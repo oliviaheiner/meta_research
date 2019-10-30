@@ -15,6 +15,7 @@ def SKM(x,A,b,beta,lam,m):
     return x
 
 
+
 def run_SKM_vary_beta(beta_max, beta_increment,x_target,A,b,lam,m,epsilon,starting_point):
     # make a dataframe to store all the data
     trial_data = pd.DataFrame(columns=['Beta', 'Run Time', 'Total Iterations'])
@@ -43,6 +44,9 @@ def run_SKM_vary_beta(beta_max, beta_increment,x_target,A,b,lam,m,epsilon,starti
         beta += beta_increment
     return trial_data
 
+
+
+
 def save_time_vs_beta_inputs_and_results(trials_directory,trial_id,figure,trial_data,A,x_target,starting_point):
     single_trial_dir = trials_directory + '/trial_' + str(trial_id)
 
@@ -60,6 +64,8 @@ def save_time_vs_beta_inputs_and_results(trials_directory,trial_id,figure,trial_
 
     file_path = single_trial_dir + '/x_0.csv'
     np.savetxt(file_path, starting_point, delimiter=",")
+
+
 
 
 def plot_beta_v_time_results(trial_data):
