@@ -6,6 +6,7 @@ import random
 from numpy import linalg as LA
 import time
 import os
+import meta_project_function_definitions as meta
 
 # Define output path
 current_directory = os.getcwd()
@@ -56,13 +57,8 @@ while(beta<=beta_max):
 
     while(error>epsilon):
         iterations += 1
-        sample_of_indices = random.sample(range(0, m), beta)
-        distances_to_hyperplane = [((abs((np.dot(A[j,:],x)-b[j])))[0]) for j in sample_of_indices]
-        t_k = sample_of_indices[distances_to_hyperplane.index(max(distances_to_hyperplane))]
-        a_t_k = A[t_k:(t_k+1),:]
-        x = x - lam*(((np.dot(a_t_k,x))-b[t_k])/((np.linalg.norm(a_t_k))**2))*np.transpose(a_t_k)
+        x = meta.SKM(x,A,b,beta,lam,m)
         error = LA.norm(x - x_target)
-
 
     time_elapsed = time.time() - start_time
     trial_data = trial_data.append({'Beta':beta,'Run Time':time_elapsed,'Total Iterations':iterations},ignore_index=True)
@@ -94,13 +90,3 @@ np.savetxt(file_path, x_target, delimiter=",")
 
 file_path = trial_directory + '/x_0.csv'
 np.savetxt(file_path, starting_point, delimiter=",")
-
-#fig, (ax1, ax2) = plt.subplots(1, 2)
-#ax1.plot(error_values)
-#ax1.title.set_text('Error Value vs Iterations')
-#ax1.set_xlabel('Iteration Number')
-#ax1.set_ylabel('Error = ||x-x*||')
-#
-#ax2.plot(range(1,5))
-#
-#plt.show()
