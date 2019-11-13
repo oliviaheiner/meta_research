@@ -5,6 +5,13 @@ from numpy import linalg as LA
 import matplotlib.pyplot as plt
 import time
 
+def normalizeRows(A):
+    A_squares = np.square(A)
+    row_sums = A_squares.sum(axis=1)
+    sqrt_row_sums = np.sqrt(row_sums)
+    normalized_A =  A / sqrt_row_sums[:,np.newaxis]
+    A = normalized_A
+    return A
 
 def SKM(x,A,b,beta,lam,m):
     sample_of_indices = random.sample(range(0, m), beta)
@@ -13,7 +20,6 @@ def SKM(x,A,b,beta,lam,m):
     a_t_k = A[t_k:(t_k+1),:]
     x = x - lam*(((np.dot(a_t_k,x))-b[t_k])/((np.linalg.norm(a_t_k))**2))*np.transpose(a_t_k)
     return x
-
 
 
 def run_SKM_vary_beta(beta_max, beta_increment,x_target,A,b,lam,m,epsilon,starting_point):
@@ -79,3 +85,48 @@ def plot_beta_v_time_results(trial_data):
     plt.ylabel('Run Time')
     plt.xticks(list(plt.xticks()[0]) + [optimal_beta])
     return [f,optimal_beta]
+
+def get_optimal_beta(trial_data):
+    optimal_run_time_index = trial_data[['Run Time']].idxmin()
+    optimal_beta = trial_data['Beta'][optimal_run_time_index].item()
+    return optimal_beta
+
+
+def std_dev_to_optimal_beta(std_dev,shape,beta_max,beta_increment,Lambda,epsilon,num_trials):
+    Mean = 0
+    m,n = shape
+    # Make a row normalized mxn matrix A with random values from some
+    # normal distribution (loc = mean, scale = std_dev)
+    optimal_beta = [None]*num_trials
+    for i in range(0,num_trials):
+        A = np.random.normal(loc = Mean, scale = std_dev, size=(m,n))
+
+        # Add ones matrix to A
+        A = A + np.ones((m,n))
+
+        # Normalize A
+        A = normalizeRows(A)
+
+        # Make a nx1 matrix x of all ones
+        x_target = np.random.normal(loc = 0, scale = 1, size=(n, 1))
+
+        # set b = A*x_target
+        b = np.dot(A,x_target)
+
+        # set lambda value
+        lam = Lambda
+
+        # set epsilon, the error value at which we stop
+        epsilon = 10**(-6)
+
+        # make random values for X_0
+        starting_point = np.random.normal(loc = 0, scale = 1, size=(n, 1))
+
+        trial_data = run_SKM_vary_beta(beta_max, beta_increment,x_target,A,b,lam,m,epsilon,starting_point)
+
+        optimal_beta[i] = get_optimal_beta(trial_data)
+        print(optimal_beta[i])
+
+    avg_opt_betas = np.mean(optimal_beta)
+    std_dev_opt_betas = np.std(optimal_beta)
+    return [avg_opt_betas,std_dev_opt_betas]
