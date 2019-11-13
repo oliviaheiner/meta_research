@@ -19,18 +19,27 @@ trials_directory = current_directory + '/trial_data'
 trial_id = 1
 
 # Define dimensions of our inputs
-m = 150000
+m = 50000
 n = 100
 
 # Define what max value of beta you want to try. Must be <= m
 beta_max = 50
 beta_increment = 1 #this is how much we'll increment beta at each iteration
 
-# Make a mxn matrix A with random values from some normal distribution
-A = np.random.normal(loc = -800, scale =1000, size=(m,n))
+# Make a row normalized mxn matrix A with random values from some
+# normal distribution (loc = mean, scale = std_dev)
+std_dev = 10
+Mean = 0
+A = np.random.normal(loc = Mean, scale = std_dev, size=(m,n))
+
+# Add ones matrix to A
+A = A + np.ones((m,n))
+
+# Normalize A
+A = meta.normalizeRows(A)
 
 # Make a nx1 matrix x of all ones
-x_target = np.random.normal(loc = 700, scale = 2000, size=(n, 1))
+x_target = np.random.normal(loc = 0, scale = 1, size=(n, 1))
 
 # set b = A*x_target
 b = np.dot(A,x_target)
@@ -42,7 +51,7 @@ lam = 1
 epsilon = 10**(-6)
 
 # make random values for X_0
-starting_point = np.random.normal(loc = 700, scale = 2000, size=(n, 1))
+starting_point = np.random.normal(loc = 0, scale = 1, size=(n, 1))
 
 
 
